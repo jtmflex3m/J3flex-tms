@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fatura — Pagamento via Pix</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{
+  --ink:#1a1a2e; --blue:#1e5fa8; --blue-soft:#eaf2fb;
+  --line:#d9dde3; --muted:#6b7280; --paper:#f4f6f8; --green:#16794f;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;padding:32px 16px;background:var(--paper);
+  font-family:Inter,Arial,sans-serif;color:var(--ink);
+  display:flex;flex-direction:column;align-items:center;
+}
+.edit-hint{font-size:12px;color:#9aa0a6;margin-bottom:14px}
+.sheet{
+  width:100%;max-width:520px;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:28px 30px 34px;
+}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.logo-left{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px}
+.logo-left .mark{
+  width:30px;height:30px;border-radius:50%;
+  background:conic-gradient(from 200deg,#2563eb,#22c55e,#f59e0b,#2563eb);
+}
+.logo-left .sub{font-size:9px;font-weight:600;color:var(--blue);letter-spacing:.06em;display:block}
+.logo-right{font-weight:800;font-size:17px;color:var(--blue)}
+.title{text-align:center;font-size:18px;margin:4px 0 20px;outline:none}
+.seller-box{
+  background:var(--blue-soft);border-radius:6px;padding:12px 16px;
+  margin-bottom:18px;font-size:13px;line-height:1.8;
+}
+.lbl{color:var(--blue)}
+[contenteditable="true"]{outline:none}
+[contenteditable="true"]:focus{
+  outline:1px dashed #7aa7d9;background:#f8fbff;border-radius:3px;
+}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:22px}
+.stat{background:var(--blue-soft);border-radius:6px;text-align:center;padding:10px 6px 12px}
+.stat .lbl{font-size:10.5px;margin-bottom:5px}
+.stat .val{font-size:13px;font-weight:700;outline:none}
+.pay-section{border-top:1px dashed var(--line);padding-top:22px;text-align:center}
+.status-badge{
+  display:inline-flex;align-items:center;gap:6px;padding:5px 12px;
+  border:1px solid var(--green);color:var(--green);font-size:12px;
+  border-radius:20px;margin-bottom:18px;
+}
+.status-badge::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green)}
+.pay-label{font-size:13px;font-weight:600;margin-bottom:14px}
+#qrcode{display:flex;justify-content:center;margin-bottom:16px}
+#qrcode img{border:1px solid var(--line);border-radius:8px;padding:8px;background:#fff}
+.pix-code-box{
+  display:flex;align-items:center;gap:8px;background:var(--paper);
+  border:1px solid var(--line);border-radius:6px;padding:10px 12px;
+}
+.pix-code-box code{
+  flex:1;font-size:10.5px;word-break:break-all;
+  font-family:"Courier New",monospace;color:var(--muted);text-align:left;
+}
+.copy-btn{
+  background:var(--blue);color:#fff;border:none;border-radius:5px;
+  padding:8px 14px;font-size:12px;cursor:pointer;white-space:nowrap;
+}
+.copy-btn:hover{background:#174a85}.copy-btn.copied{background:var(--green)}
+.hint{font-size:11.5px;color:var(--muted);margin-top:14px}
+@media(max-width:480px){
+  body{padding:16px 8px}.sheet{padding:22px 18px 28px}
+  .grid{gap:5px}.stat .val{font-size:12px}
+  .pix-code-box{align-items:flex-start}.copy-btn{padding:8px 10px}
+}
+</style>
+</head>
+<body>
+
+<div class="edit-hint">Clique nos campos para editar as informações da fatura</div>
+
+<div class="sheet">
+
+  <div class="topbar">
+    <div class="logo-left">
+      <div class="mark"></div>
+      <div>J3<span class="sub">FLEX</span></div>
+    </div>
+    <div class="logo-right">J3TMS</div>
+  </div>
+
+  <h1 class="title" contenteditable="true">Fatura #150032</h1>
+
+  <div class="seller-box">
+    <div><span class="lbl">Seller:</span> <b contenteditable="true">Seisa tecnologia ltda</b></div>
+    <div><span class="lbl">ID:</span> <span contenteditable="true">J3YXHEI1L</span></div>
+    <div><span class="lbl">CNPJ:</span> <span contenteditable="true">35.714.778/0001-47</span></div>
+  </div>
+
+  <div class="grid">
+    <div class="stat">
+      <div class="lbl">Vencimento</div>
+      <div class="val" contenteditable="true">05/09/2026</div>
+    </div>
+    <div class="stat">
+      <div class="lbl">Valor Total</div>
+      <div class="val" contenteditable="true">R$ 1.998,97</div>
+    </div>
+    <div class="stat">
+      <div class="lbl">Período</div>
+      <div class="val" contenteditable="true">16/08 a 31/08</div>
+    </div>
+  </div>
+
+  <div class="pay-section">
+    <div class="status-badge">Aguardando pagamento</div>
+    <div class="pay-label">Escaneie o QR Code para pagar via Pix</div>
+
+    <div id="qrcode"></div>
+
+    <div class="pix-code-box">
+      <code id="pix-code">00020101021226820014br.gov.bcb.pix2560qrcode.a55scd.com.br/v1/e78ba889-5e7c-4c49-9858-bca574e45e2b5204000053039865802BR5917SANGOENTRETENIMEN6008SAOPAULO62070503***63042EDC</code>
+      <button class="copy-btn" onclick="copyPix(this)">Copiar</button>
+    </div>
+
+    <div class="hint">Pix Copia e Cola — cole no app do seu banco caso prefira não escanear</div>
+  </div>
+
+</div>
+
+<script>
+const pixPayload = document.getElementById("pix-code").textContent.trim();
+
+new QRCode(document.getElementById("qrcode"), {
+  text: pixPayload,
+  width: 200,
+  height: 200,
+  colorDark: "#1a1a2e",
+  colorLight: "#ffffff",
+  correctLevel: QRCode.CorrectLevel.M
+});
+
+function copyPix(btn){
+  navigator.clipboard.writeText(pixPayload).then(()=>{
+    const original = btn.textContent;
+    btn.textContent = "Copiado!";
+    btn.classList.add("copied");
+    setTimeout(()=>{
+      btn.textContent = original;
+      btn.classList.remove("copied");
+    },1800);
+  });
+}
+</script>
+
+</body>
+</html>
